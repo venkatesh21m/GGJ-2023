@@ -28,17 +28,13 @@ namespace Rudrac.GGJ2023
                     float _dist = Vector2.Distance(attractor.transform.position, attractee.transform.position);
                     if (_dist < attractor.GravityRadius)
                     {
+                        attractee.transform.SetParent(attractor.transform, true);
                         if (attractor != attractee)
                         {
                             attractee.BeingAttractedBy = true;
                             attractee.AttractedBy = attractor;
                             AddGravityForce(attractor.Rigidbody, attractee.Rigidbody);
                         }
-                    }
-                    else
-                    {
-                        attractee.BeingAttractedBy = false;
-                        attractee.AttractedBy = null;
                     }
                 }
             }
