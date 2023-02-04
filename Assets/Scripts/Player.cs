@@ -10,6 +10,7 @@ namespace Rudrac.GGJ2023
         public static Player instance;
         public static event Action UsingThrust;
         public static event Action GroundedEvent;
+        public static event Action<bool> MapCameraState;
 
 
         public Graviton Graviton;
@@ -17,6 +18,7 @@ namespace Rudrac.GGJ2023
         public Key leftKey = Key.A;
         public Key RightKey = Key.D;
         public Key PlantKey = Key.G;
+        public Key MapKey = Key.M;
         public float ThurstMagnitude = 1.0f;
         public float RotationSpeed = 1.0f;
         public float MovementSpeed = 1.0f;
@@ -84,6 +86,15 @@ namespace Rudrac.GGJ2023
                         //Launched?.Invoke();
                     }
                 }
+            }
+
+            if (Keyboard.current[MapKey].wasPressedThisFrame)
+            {
+                MapCameraState?.Invoke(true);
+            }
+            else if (Keyboard.current[MapKey].wasReleasedThisFrame)
+            {
+                MapCameraState?.Invoke(false);
             }
         }
 
