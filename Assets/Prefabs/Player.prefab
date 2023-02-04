@@ -466,10 +466,10 @@ MonoBehaviour:
   leftKey: 18
   RightKey: 15
   ThurstMagnitude: 2
-  RotationSpeed: 25
+  RotationSpeed: 5
   MovementSpeed: 20
-  MaxAccumulatedForce: 15
-  MinAccumulatedForce: 35
+  MaxAccumulatedForce: 35
+  MinAccumulatedForce: 15
   AccumulationFillingForce: 0.1
 --- !u!70 &6372281266587572118
 CapsuleCollider2D:

@@ -18,13 +18,19 @@ namespace Rudrac.GGJ2023
         public CanvasGroup GameUI;
         public CanvasGroup JumpForceUI;
 
-        private float X;
-        private Sequence SelectionIndicatorSequence;
-        private Player Player;
-        private void Start() => Player = Player.instance;
+        private float _x;
+        private Sequence _selectionIndicatorSequence;
+        private Player _player;
+        private void Start()
+        {
+            _player = Player.instance;
+
+            ResetChances();
+        }
+
         private void Update()
         {
-            if (!Player.Grounded)
+            if (!_player.Grounded)
                 return;
 
             if (Keyboard.current[ThurstKey].wasPressedThisFrame)
@@ -36,25 +42,26 @@ namespace Rudrac.GGJ2023
 
             if (Keyboard.current[ThurstKey].wasReleasedThisFrame)
             {
-                SelectionIndicatorSequence.Kill();
+                _selectionIndicatorSequence.Kill();
+                Launched?.Invoke(GetSuccessState());
                 HideUI();
             }
         }
 
-        private bool GetSuccessState() => SelectionIndicator.anchoredPosition.x < X + 100 && SelectionIndicator.anchoredPosition.x > X - 100;
+        private bool GetSuccessState() => SelectionIndicator.anchoredPosition.x < _x + 100 && SelectionIndicator.anchoredPosition.x > _x - 100;
 
         private void StartMovement()
         {
-            SelectionIndicatorSequence = DOTween.Sequence();
-            _ = SelectionIndicatorSequence.Append(SelectionIndicator.DOAnchorPosX(950, UnityEngine.Random.Range(minTime, maxTime)).SetEase((Ease)UnityEngine.Random.Range(0, 20)));
-            _ = SelectionIndicatorSequence.Append(SelectionIndicator.DOAnchorPosX(0, UnityEngine.Random.Range(minTime, maxTime)).SetEase((Ease)UnityEngine.Random.Range(0, 20)));
-            _ = SelectionIndicatorSequence.SetLoops(-1);
+            _selectionIndicatorSequence = DOTween.Sequence();
+            _ = _selectionIndicatorSequence.Append(SelectionIndicator.DOAnchorPosX(950, UnityEngine.Random.Range(minTime, maxTime)).SetEase((Ease)UnityEngine.Random.Range(0, 20)));
+            _ = _selectionIndicatorSequence.Append(SelectionIndicator.DOAnchorPosX(0, UnityEngine.Random.Range(minTime, maxTime)).SetEase((Ease)UnityEngine.Random.Range(0, 20)));
+            _ = _selectionIndicatorSequence.SetLoops(-1);
         }
 
         private void SetUpUI()
         {
-            X = UnityEngine.Random.Range(0, 800);
-            MaxIndicator.anchoredPosition = new Vector2(X, MaxIndicator.anchoredPosition.y);
+            _x = UnityEngine.Random.Range(0, 800);
+            MaxIndicator.anchoredPosition = new Vector2(_x, MaxIndicator.anchoredPosition.y);
             SelectionIndicator.anchoredPosition = new Vector2(0, SelectionIndicator.anchoredPosition.y);
 
             _ = JumpForceUI.DOFade(1, 0.25f);
@@ -65,10 +72,14 @@ namespace Rudrac.GGJ2023
         {
             await System.Threading.Tasks.Task.Delay(500);
             _ = JumpForceUI.DOFade(0, 0.25f);
-            _ = GameUI.DOFade(1, 0.25f).OnComplete(() =>
-            {
-                Launched?.Invoke(GetSuccessState());
-            });
+            _ = GameUI.DOFade(1, 0.25f).OnComplete(() => ResetChances());
+
+        }
+
+        private void ResetChances()
+        {
+            _x = 0;
+            SelectionIndicator.anchoredPosition = new Vector2(800, MaxIndicator.anchoredPosition.y);
         }
     }
 }
