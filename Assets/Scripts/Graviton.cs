@@ -12,13 +12,16 @@ namespace Rudrac.GGJ2023
         [SerializeField] private Vector3 _initialVelocity;
         [SerializeField] private bool _applyInitialVelocityOnStart;
         [SerializeField] private float _gravityRadius;
+        [SerializeField] private bool _LevelFinish;
 
         [Header("For Debug")]
         public bool BeingAttractedBy = false;
         public Graviton AttractedBy = null;
         public CircleCollider2D Trigger;
+        public LineRenderer CircleRenderer;
 
-
+        public GameObject[] Seeds;
+        [HideInInspector] public int SeedsCount =0;
         public bool IsAttractee//property 
         {
             get => _isAttractee;
@@ -76,6 +79,13 @@ namespace Rudrac.GGJ2023
             {
                 ApplyVelocity(_initialVelocity);
             }
+            if (CircleRenderer != null)
+            {
+                CircleRenderer.useWorldSpace = false;
+                DrawCircle(60, GravityRadius / transform.lossyScale.x);
+            }
+
+            SeedsCount = Seeds.Length;
         }
 
         private void OnDisable()
@@ -94,9 +104,16 @@ namespace Rudrac.GGJ2023
 
         private void OnValidate()
         {
+            if (IsAttractee)
+            {
+                _gravityRadius = transform.lossyScale.x;
+            }
+
             if (Trigger == null)
                 return;
             Trigger.radius = GravityRadius / transform.lossyScale.x;
+
+
         }
 
 
@@ -110,6 +127,12 @@ namespace Rudrac.GGJ2023
             GravityHandler.Attractees[0].AttractedBy = this;
             GravityHandler.Attractees[0].BeingAttractedBy = true;
             _ = StartCoroutine(Player.instance.RotateCharacter());
+
+
+            if (_LevelFinish)
+            {
+                Debug.LogError("Game Over");
+            }
         }
 
         private void OnTriggerExit2D(Collider2D collision)
@@ -126,5 +149,46 @@ namespace Rudrac.GGJ2023
 
 
 
+
+        public void DrawCircle(int steps, float radius)
+        {
+            CircleRenderer.positionCount = steps + 1;
+
+            for (int i = 0; i <= steps; i++)
+            {
+                float circumferenceprogress = (float)i/steps;
+                float radian = circumferenceprogress *2*Mathf.PI;
+                float xScaled = Mathf.Cos(radian);
+                float yScaled = Mathf.Sin(radian);
+
+                float x = xScaled *radius;
+                float y = yScaled *radius;
+
+                Vector3 currentPos = new Vector3(x, y, 0);
+                CircleRenderer.SetPosition(i, currentPos);
+            }
+        }
+        internal void SpawnSeed()
+        {
+            SeedsCount--;
+            var seed = Seeds[SeedsCount];
+
+            // Rotate the seed to player pos
+            Vector3 vectorToTarget = Player.instance.transform.position - seed.transform.position;
+
+            // rotate that vector by 90 degrees around the Z axis
+            Vector3 rotatedVectorToTarget = Quaternion.Euler(0, 0, 0) * vectorToTarget;
+
+            // get the rotation that points the Z axis forward, and the Y axis 90 degrees away from the target
+            // (resulting in the X axis facing the target)
+            Quaternion targetRotation = Quaternion.LookRotation(forward: Vector3.forward, upwards: rotatedVectorToTarget);
+
+            seed.transform.rotation = targetRotation;
+
+            // Enable it.
+            seed.gameObject.SetActive(true);
+
+
+        }
     }
 }

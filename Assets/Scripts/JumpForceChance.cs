@@ -30,7 +30,7 @@ namespace Rudrac.GGJ2023
 
         private void Update()
         {
-            if (!_player.Grounded)
+            if (!_player.Grounded || BoostersManager.BoosterCount == 0)
                 return;
 
             if (Keyboard.current[ThurstKey].wasPressedThisFrame)

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,6 +6,7 @@ namespace Rudrac.GGJ2023
 {
     public class ThrustManager : MonoBehaviour
     {
+        public static Action ThrustIncreased;
         public float MaxThrust;
         public float ThrustUsageRate;
         public Slider ThrustSlider;
@@ -19,9 +21,22 @@ namespace Rudrac.GGJ2023
             ThrustSlider.value = MaxThrust;
 
             Player.UsingThrust += UsingThrust;
+            ThrustIncreased += ThrustIncreasedMethod;
         }
 
-        private void OnDestroy() => Player.UsingThrust -= UsingThrust;
+        private void OnDestroy()
+        {
+            Player.UsingThrust -= UsingThrust;
+            ThrustIncreased -= ThrustIncreasedMethod;
+        }
+
+        private void ThrustIncreasedMethod()
+        {
+            CurrentThrust += 3;
+            if (CurrentThrust > MaxThrust) CurrentThrust = MaxThrust;
+            ThrustSlider.value = CurrentThrust;
+
+        }
 
         public void UsingThrust()
         {

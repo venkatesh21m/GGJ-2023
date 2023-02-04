@@ -8,14 +8,15 @@ namespace Rudrac.GGJ2023
     public class Player : MonoBehaviour
     {
         public static Player instance;
-
-
         public static event Action UsingThrust;
+        public static event Action GroundedEvent;
+
 
         public Graviton Graviton;
         public Key ThurstKey = Key.Space;
         public Key leftKey = Key.A;
         public Key RightKey = Key.D;
+        public Key PlantKey = Key.G;
         public float ThurstMagnitude = 1.0f;
         public float RotationSpeed = 1.0f;
         public float MovementSpeed = 1.0f;
@@ -61,16 +62,6 @@ namespace Rudrac.GGJ2023
                         applyingThrust = false;
                     }
 
-                    //if (Keyboard.current[leftKey].isPressed)
-                    //{
-                    //    RotateInAir(-1);
-                    //}
-                    //else if (Keyboard.current[RightKey].isPressed)
-                    //{
-                    //    RotateInAir(1);
-                    //    //movement.x = 1;
-                    //}
-
                 }
                 else
                 {
@@ -84,14 +75,12 @@ namespace Rudrac.GGJ2023
                         transform.RotateAround(transform.parent.transform.position, Vector3.forward, MovementSpeed * Time.deltaTime);
                         //movement.x = 1;
                     }
-                    else
-                    {
-                        //movement.x = 0;
-                    }
 
-                    if (Keyboard.current[ThurstKey].wasReleasedThisFrame)
+                    if (Keyboard.current[PlantKey].wasReleasedThisFrame)
                     {
+                        if (Graviton.AttractedBy.SeedsCount == 0) { return; }
 
+                        Graviton.AttractedBy.SpawnSeed();
                         //Launched?.Invoke();
                     }
                 }
@@ -122,17 +111,21 @@ namespace Rudrac.GGJ2023
 
         public void ApplyThurst()
         {
-            if (Graviton.AttractedBy == null)
-            {
-                return;
-            }
 
             if (ThrustManager.CurrentThrust <= 0)
             {
                 return;
             }
 
-            Vector3 force =  GravityHandler.GetForceFactor(Graviton.AttractedBy.Rigidbody, Graviton.Rigidbody, true);
+            Vector3 force = Vector3.zero;
+            if (Graviton.AttractedBy == null)
+            {
+                force = -transform.right;
+            }
+            else
+            {
+                force = GravityHandler.GetForceFactor(Graviton.AttractedBy.Rigidbody, Graviton.Rigidbody, true);
+            }
             Graviton.Rigidbody.AddForce(force * ThurstMagnitude);
 
             UsingThrust?.Invoke();
@@ -162,25 +155,13 @@ namespace Rudrac.GGJ2023
             }
         }
 
-        public void RotateInAir(int x)
-        {
-            // rotate that vector by 90 degrees around the Z axis
-            Vector3 rotatedVectorToTarget = Quaternion.Euler(0, 0, 90) * transform.right * x;
-
-            // get the rotation that points the Z axis forward, and the Y axis 90 degrees away from the target
-            // (resulting in the X axis facing the target)
-            Quaternion targetRotation = Quaternion.LookRotation(forward: Vector3.forward, upwards: rotatedVectorToTarget);
-
-            // changed this from a lerp to a RotateTowards because you were supplying a "speed" not an interpolation value
-            Quaternion rot = Quaternion.RotateTowards(transform.rotation, targetRotation, RotationSpeed);
-            Graviton.Rigidbody.MoveRotation(rot);
-        }
-
         private void OnCollisionEnter2D(Collision2D collision)
         {
             Grounded = true;
             Graviton.Rigidbody.constraints = RigidbodyConstraints2D.FreezeRotation;
             Graviton.Rigidbody.velocity = Vector2.zero;
+
+            GroundedEvent?.Invoke();
             //transform.LookAt(GetDirection(),);
             //Debug.Log("Grounded set to " + Grounded);
         }
