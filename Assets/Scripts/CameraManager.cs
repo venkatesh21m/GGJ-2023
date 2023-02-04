@@ -10,14 +10,14 @@ namespace Rudrac.GGJ2023
 
         private void Start()
         {
-            Player.chargingForLaunch += Charging;
-            Player.Launched += Launched;
+            JumpForceChance.ChargingForLaunch += Charging;
+            JumpForceChance.Launched += Launched;
         }
 
         private void OnDestroy()
         {
-            Player.chargingForLaunch -= Charging;
-            Player.Launched -= Launched;
+            JumpForceChance.ChargingForLaunch -= Charging;
+            JumpForceChance.Launched -= Launched;
         }
 
         private void Charging()
@@ -26,7 +26,7 @@ namespace Rudrac.GGJ2023
             LaunchCamera.enabled = true;
         }
 
-        private void Launched()
+        private void Launched(bool state)
         {
             LaunchCamera.enabled = false;
             NormalCamera.enabled = true;

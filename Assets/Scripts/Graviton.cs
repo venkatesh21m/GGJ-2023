@@ -16,6 +16,8 @@ namespace Rudrac.GGJ2023
         [Header("For Debug")]
         public bool BeingAttractedBy = false;
         public Graviton AttractedBy = null;
+        public CircleCollider2D Trigger;
+
 
         public bool IsAttractee//property 
         {
@@ -44,12 +46,12 @@ namespace Rudrac.GGJ2023
             {
                 if (value == true)
                 {
-                    if (!GravityHandler.Attractors.Contains(this))
-                        GravityHandler.Attractors.Add(this);
+                    //if (!GravityHandler.Attractors.Contains(this))
+                    //    GravityHandler.Attractors.Add(this);
                 }
                 else if (value == false)
                 {
-                    _ = GravityHandler.Attractors.Remove(this);
+                    //_ = GravityHandler.Attractors.Remove(this);
                 }
 
                 _isAttractor = value;
@@ -58,7 +60,6 @@ namespace Rudrac.GGJ2023
 
         public Rigidbody2D Rigidbody { get; private set; }
         public float GravityRadius => _gravityRadius;
-
 
         private void Awake() => Rigidbody = GetComponent<Rigidbody2D>();
 
@@ -90,5 +91,40 @@ namespace Rudrac.GGJ2023
             Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(transform.position, GravityRadius);
         }
+
+        private void OnValidate()
+        {
+            if (Trigger == null)
+                return;
+            Trigger.radius = GravityRadius / transform.lossyScale.x;
+        }
+
+
+        private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (!collision.CompareTag("Player"))
+                return;
+            //Debug.Log("Player inside planet range", gameObject);
+            if (!GravityHandler.Attractors.Contains(this))
+                GravityHandler.Attractors.Add(this);
+            GravityHandler.Attractees[0].AttractedBy = this;
+            GravityHandler.Attractees[0].BeingAttractedBy = true;
+            _ = StartCoroutine(Player.instance.RotateCharacter());
+        }
+
+        private void OnTriggerExit2D(Collider2D collision)
+        {
+            if (!collision.CompareTag("Player"))
+                return;
+            //Debug.Log("Player Outside planet range", gameObject);
+
+            _ = GravityHandler.Attractors.Remove(this);
+            GravityHandler.Attractees[0].AttractedBy = null;
+            GravityHandler.Attractees[0].BeingAttractedBy = false;
+            StopCoroutine(Player.instance.RotateCharacter());
+        }
+
+
+
     }
 }

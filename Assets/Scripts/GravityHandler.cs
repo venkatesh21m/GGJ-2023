@@ -21,9 +21,9 @@ namespace Rudrac.GGJ2023
         }
         public static void SimulateGravities()
         {
-            foreach (Graviton attractor in Attractors)
+            foreach (Graviton attractee in Attractees)
             {
-                foreach (Graviton attractee in Attractees)
+                foreach (Graviton attractor in Attractors)
                 {
                     float _dist = Vector2.Distance(attractor.transform.position, attractee.transform.position);
                     if (_dist < attractor.GravityRadius)
@@ -31,8 +31,7 @@ namespace Rudrac.GGJ2023
                         attractee.transform.SetParent(attractor.transform, true);
                         if (attractor != attractee)
                         {
-                            attractee.BeingAttractedBy = true;
-                            attractee.AttractedBy = attractor;
+
                             AddGravityForce(attractor.Rigidbody, attractee.Rigidbody);
                         }
                     }
