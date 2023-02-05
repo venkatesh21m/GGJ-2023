@@ -14,7 +14,7 @@ namespace Rudrac.GGJ2023
         public List<RootPoints> RootPoints;
         public SpriteRenderer Booster;
         private Graviton currentPlanet;
-
+        public bool LevelExtract;
 
 
         // Start is called before the first frame update
@@ -161,7 +161,11 @@ namespace Rudrac.GGJ2023
             if (!collision.CompareTag("Player")) return;
             if (Booster.gameObject.activeSelf && Booster.color == Color.green)
             {
-                if (BoostersManager.BoosterCount == 5)
+                if (LevelExtract)
+                {
+                    LevelExtractsManager.LevelExtractCollected?.Invoke();
+                }
+                else if (BoostersManager.BoosterCount == 5)
                 {
                     ThrustManager.ThrustIncreased?.Invoke();
                 }

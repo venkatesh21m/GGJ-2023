@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Rudrac.GGJ2023
@@ -5,6 +6,7 @@ namespace Rudrac.GGJ2023
     [AddComponentMenu("GGJ2023/Graviton")]
     public class Graviton : MonoBehaviour
     {
+        public static Action LevelFinished;
 
         [SerializeField] private bool _isAttractee;//field
         [SerializeField] private bool _isAttractor;//field
@@ -12,7 +14,9 @@ namespace Rudrac.GGJ2023
         [SerializeField] private Vector3 _initialVelocity;
         [SerializeField] private bool _applyInitialVelocityOnStart;
         [SerializeField] private float _gravityRadius;
-        [SerializeField] private bool _LevelFinish;
+        [SerializeField] private bool _LevelGoal;
+        [SerializeField] private bool _LevelStart;
+        [SerializeField] private bool _Enemy;
 
         [Header("For Debug")]
         public bool BeingAttractedBy = false;
@@ -129,11 +133,24 @@ namespace Rudrac.GGJ2023
             _ = StartCoroutine(Player.instance.RotateCharacter());
 
 
-            if (_LevelFinish)
+            if (_LevelGoal)
             {
-                Debug.LogError("Game Over");
+                Debug.LogError("Start Extracting");
+            }
+            else if (_LevelStart)
+            {
+                if (LevelExtractsManager.LevelExtractsCount >= 5)
+                {
+                    Debug.LogError("Level Finished");
+                }
+            }
+            else if (_Enemy)
+            {
+                Invoke(nameof(RestartLevel), 5);
             }
         }
+
+        private void RestartLevel() => Scenesmanager.instance.ReloadScene();
 
         private void OnTriggerExit2D(Collider2D collision)
         {

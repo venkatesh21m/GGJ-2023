@@ -15,7 +15,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &334247533025091113
 Transform:
   m_ObjectHideFlags: 0
@@ -205,6 +205,8 @@ MonoBehaviour:
   _initialVelocity: {x: 0, y: 0, z: 0}
   _applyInitialVelocityOnStart: 0
   _gravityRadius: 5
+  _LevelGoal: 0
+  _LevelStart: 0
   BeingAttractedBy: 0
   AttractedBy: {fileID: 0}
   Trigger: {fileID: 9122779208144169094}
@@ -593,7 +595,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3548314657334096033, guid: 9b4da6b4b94af794692e11298df679d6, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3548314657334096039, guid: 9b4da6b4b94af794692e11298df679d6, type: 3}
       propertyPath: m_RootOrder

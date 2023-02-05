@@ -7,15 +7,16 @@ namespace Rudrac.GGJ2023
     public class BoostersManager : MonoBehaviour
     {
         public static Action BoosterCollected;
-
+        public bool EmptyStart;
         public Image[] Boosters;
         public static int BoosterCount = 5;
 
         private void Start()
         {
-            BoosterCount = Boosters.Length;
+            BoosterCount = EmptyStart ? 0 : Boosters.Length;
             JumpForceChance.Launched += BoosterUsed;
             BoosterCollected += BoosterCollectedMethod;
+            BoosterCountChanged();
         }
 
         private void OnDestroy()
