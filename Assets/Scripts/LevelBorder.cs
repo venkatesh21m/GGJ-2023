@@ -7,7 +7,8 @@ namespace Rudrac.GGJ2023
         private void OnTriggerExit2D(Collider2D collision)
         {
             if (!collision.CompareTag("Player")) return;
-            Debug.LogError("Game Over");
+
+            Scenesmanager.instance.ReloadScene();
         }
     }
 }
